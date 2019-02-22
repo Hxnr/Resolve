@@ -1,0 +1,123 @@
+<p>videoPlayer</p>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<div id="videoPlayer"> 
+    <div class="container">
+        <video id="video" controls>
+            <source src="sample.mp4" type="video/mp4">
+        </video>
+        <div id="controls">
+            <button id="playpause" title="▶" onclick="togglePlayPause()">▶</button>
+        </div>
+        <button onmouseover="zaw()" onmouseout="zax()" id="zaw"><input onmouseover="zaw()" onmouseout="zax()" id="volume" min="0" max="1" step="0.1" type="range" onchange="setVolume()" /></button>
+        <button id="mute" onclick="toggleMute()">Mute</button>
+        <div id="progressBar"><span id="progress"></span></div>
+    </div>
+ </div>
+
+ <video controls>
+    <source src="sample.mp4" type="video/mp4">
+</video>
+
+  </body> 
+  </html>
+
+
+  <script>
+
+    var video = document.getElementById("video");
+    video.controls = false;
+    function togglePlayPause() {
+    var playpause = document.getElementById("playpause");
+    if (video.paused || video.ended) {
+      playpause.title = "❚❚";
+      playpause.innerHTML = "❚❚";
+      video.play();
+    }
+    else {
+      playpause.title = "▶";
+      playpause.innerHTML = "▶";
+      video.pause();
+   }
+}
+
+
+function setVolume() {
+   var volume = document.getElementById("volume");
+   video.volume = volume.value;
+}
+
+function toggleMute() {
+   video.muted = !video.muted;
+}
+
+
+function updateProgress() {
+   var progress = document.getElementById("progress");
+   var value = 0;
+   if (video.currentTime > 0) {
+      value = Math.floor((100 / video.duration) * video.currentTime);
+   }
+   progress.style.width = value + "%";
+}
+
+video.addEventListener("timeupdate", updateProgress, false);
+
+video.addEventListener('play', function() {
+   var playpause = document.getElementById("playpause");
+   playpause.title = "❚❚";
+   playpause.innerHTML = "❚❚";
+}, false);
+video.addEventListener('pause', function() {
+   var playpause = document.getElementById("playpause");
+   playpause.title = "▶";
+   playpause.innerHTML = "▶";
+}, false);
+
+video.addEventListener('ended', function() { this.pause(); }, false);
+
+var v = document.getElementById("video");
+v.addEventListener( "loadedmetadata", function (e) {
+    var zwidth = this.videoWidth,
+        zheight = this.videoHeight;
+        $('#progressBar').css('width', zwidth-20);
+}, false );
+
+
+function zaw() {
+$('#volume').css('display', 'block');
+
+}
+
+function zax() {
+$('#volume').css('display', 'none');
+
+}
+ </script>
+
+ <style>
+ #progressBar { 
+   border:1px solid #aaa; 
+   color:#fff; 
+   height:20px;
+}
+#progress {
+   background-color:#000;
+   height:20px;
+   display:inline-block;
+}
+
+#video { padding: 15px; }
+
+
+#videoPlayer {  text-align: left; padding: 10px; width: auto; max-width: 100%; position: relative; }
+
+#controls { position: absolute; top: 82%; left: 3%; }
+
+#progressBar { position: absolute; top: 87%; left: 3%; }
+
+.container { max-width: 800px; position: relative; border: 1px solid black; }
+#volume { display: none; }
+</style>
