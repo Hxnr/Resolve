@@ -15,125 +15,70 @@
      </head>
      <body>
 
+    <div class="top">
+        <p>image editor</p>
+    </div>
      <!-- HTML Part -->
      <div class="master">
          <div class="bk">
              <div class="uploader">
-                 <input type='file' onchange="readURL(this);" accept="image/*"/>
+                 <input type='file' onchange="readURL(this);" accept="image/*" id="inputIMG"/>
                  <br>
                  <img id="uploadedImage" src="#" alt="your image" />
              </div>
              <div class="editor">
+                 <p>filters</p>
                  <input type="range" min="0" max="100" value="0" class="slider" id="sliderSepia">sepia
                  <p id="outputSepia"></p>
-                 <input type="range" min="0" max="10" value="0" class="slider" id="sliderBlur">blur
+                 <input type="range" min="0" max="100" value="0" class="slider" id="sliderBlur">blur
                  <p id="outputBlur"></p>
                  <input type="range" min="0" max="10" value="0" class="slider" id="sliderGrayscale">gray
                  <p id="outputGrayscale"></p>
-
                  <input type="range" min="1" max="10" value="1" class="slider" id="sliderSaturate">Saturate
                  <p id="outputSaturate"></p>
-
                  <input type="range" min="0" max="100" value="0" class="slider" id="sliderHue">Hue
                  <p id="outputHue"></p>
+                 <input type="range" min="0" max="50" value="10" class="slider" id="sliderBrightness">Brightness
+                 <p id="outputBrightness"></p>
+                 <input type="range" min="0" max="50" value="10" class="slider" id="sliderContrast">Contrast
+                 <p id="outputContrast"></p>
+                 <input type="range" min="0" max="10" value="10" class="slider" id="sliderOpacity">Opacity
+                 <p id="outputOpacity"></p>
+             </div>
+             <div class="submit">
+                 <button id="btn-submit" onclick="submit(); drawImage();">submit image</button>
              </div>
          </div>
+         <hr>
+         <p>output:</p>
+        <!--<img src="sample.png"/>
+        -->
+        <canvas id="canvas"></canvas>
+        <br>
      </div>
 </body>
 </html>
 
 <style>
+
+
+
 #blah { border: 2px dashed black; padding: 15px; }
+
 .master { text-align: center; }
-.bk { height: auto; padding: 20px; background: #eeeeee; margin-top: 10%; }
+
+.bk { height: auto; padding: 20px; background: #eeeeee; margin-top: 1%; }
+
 html { background: #fff; }
-.uploader, .editor { display: inline-block; border: 1px solid red; vertical-align: top; }
+
+.uploader, .editor { display: inline-block; border: 1px dashed #b1b1b1; padding: 5px; vertical-align: top; }
+
+.submit { max-width: 104px; margin-top: 25px; border: 1px solid green; vertical-align: top; padding: none !important; margin-left: auto; margin-right: auto; }
+
+.top { text-align: center; margin-top: 6%; font-size: 35px; }
+
+#canvas { border: 2px dashed gray; }
+
 </style>
 
-<script>
-var scaleFactor = 0;
-var sepiaAmt = 0;
-var blurAmt = 0;
-var grayscaleAmt = 0;
-var saturateAmt = 1;
-var hueAmt = 0;
-
-function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var scaleImage = new Image();
-            scaleImage.src = e.target.result;
-            scaleImage.onload = function() {
-                scaleFactor = this.height/this.width;
-                console.log("Scale Factor: " + scaleFactor);
-            };
-            $('#uploadedImage')
-                .attr('src', e.target.result)
-                .height(500)
-                .width(this.width * scaleFactor);              
-            };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-/*Sepia*/
-var sliderSepia = document.getElementById("sliderSepia");
-var outputSepia = document.getElementById("outputSepia");
-outputSepia.innerHTML = sliderSepia.value;
-sliderSepia.oninput = function() {
-    outputSepia.innerHTML = this.value;
-    sepiaAmt = this.value;
-    runImageFilter();
-}
-
-/*Blur*/
-var sliderBlur = document.getElementById("sliderBlur");
-var outputBlur = document.getElementById("outputBlur");
-outputBlur.innerHTML = sliderBlur.value;
-sliderBlur.oninput = function() {
-    outputBlur.innerHTML = this.value;
-    blurAmt = this.value;
-    runImageFilter();
-}
-
-/*Grayscale*/
-var sliderGrayscale = document.getElementById("sliderGrayscale");
-var outputGrayscale = document.getElementById("outputGrayscale");
-outputGrayscale.innerHTML = sliderGrayscale.value;
-sliderGrayscale.oninput = function() {
-    outputGrayscale.innerHTML = this.value;
-    grayscaleAmt = this.value;
-    runImageFilter();
-}
-
-/*Saturate*/
-var sliderSaturate = document.getElementById("sliderSaturate");
-var outputSaturate = document.getElementById("outputSaturate");
-outputSaturate.innerHTML = sliderSaturate.value;
-sliderSaturate.oninput = function() {
-    outputSaturate.innerHTML = this.value;
-    saturateAmt = this.value;
-    runImageFilter();
-}
-
-/*Hue*/
-var sliderHue = document.getElementById("sliderHue");
-var outputHue = document.getElementById("outputHue");
-outputHue.innerHTML = sliderHue.value;
-sliderHue.oninput = function() {
-    outputHue.innerHTML = this.value;
-    hueAmt = this.value;
-    runImageFilter();
-}
-
-function runImageFilter() {
-    $('#uploadedImage').css('filter', 'sepia('+(sepiaAmt)+'%) blur('+(blurAmt)+'px) grayscale('+(grayscaleAmt/10)+') saturate('+(saturateAmt)+') hue-rotate('+(hueAmt)+'deg)');
-    console.log("sepia " + sepiaAmt);
-    console.log("blur " + blurAmt);
-    console.log("gray " + grayscaleAmt);
-    console.log("sat " + saturateAmt);
-    console.log("hue " + hueAmt);
-}
-
-</script>
+<script src="script.js"></script>
