@@ -8,6 +8,9 @@ var brightnessAmt = 10;
 var contrastAmt = 10;
 var opacityAmt = 10;
 
+var applyImgHeight = 0;
+var applyImgWidth = 0;
+
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -116,37 +119,33 @@ sliderOpacity.oninput = function () {
 
 function runImageFilter() {
     $('#uploadedImage').css('filter', 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 10) + ')');
-    /* console.log("sepia " + sepiaAmt);
-     console.log("blur " + blurAmt);
-     console.log("gray " + grayscaleAmt);
-     console.log("sat " + saturateAmt);
-     console.log("hue " + hueAmt);*/
 }
 
 var canvas2 = document.getElementsByTagName('canvas')[0];
-canvas2.height = 1000;
-canvas2.width = 1000;
+canvas2.height = 400;
+canvas2.width = 400;
 
 function drawImage(ev) {
-    console.log(ev);
     var ctx = document.getElementById('canvas').getContext('2d'),
-        img = new Image(500, 500),
+        img = new Image(),
         f = document.getElementById("inputIMG").files[0],
         url = window.URL || window.webkitURL,
         src = url.createObjectURL(f);
     img.src = src;
-   // var canvas2 = document.getElementsByTagName('canvas')[0];
-    //canvas2.height = 1000;
-   // canvas2.width = 1000;
     img.onload = function () {
-        ctx.drawImage(img, 0, 0, applyImgWidth, applyImgHeight);
+        getCanvasSize();
+        ctx.drawImage(img, (canvas2.width / 2 - applyImgWidth / 2), (canvas2.height / 2 - applyImgHeight / 2), applyImgWidth, applyImgHeight);
         url.revokeObjectURL(src);
     }
 }
 
+function getCanvasSize() {
+    canvas2.width = applyImgWidth+100;
+    canvas2.height = applyImgHeight+100;
+}
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-
 
 function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
