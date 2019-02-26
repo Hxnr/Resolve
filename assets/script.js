@@ -141,6 +141,8 @@ function drawImage(ev) {
 }
 
 function getCanvasSize() {
+    applyImgHeight = ($('#uploadedImage').height());
+    applyImgWidth = ($('#uploadedImage').width());
     canvas2.width = applyImgWidth+100;
     canvas2.height = applyImgHeight+100;
 }
