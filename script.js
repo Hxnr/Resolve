@@ -122,8 +122,8 @@ function runImageFilter() {
 }
 
 var canvas2 = document.getElementsByTagName('canvas')[0];
-canvas2.height = 400;
-canvas2.width = 400;
+canvas2.height = 600;
+canvas2.width = 600;
 
 function drawImage(ev) {
     var ctx = document.getElementById('canvas').getContext('2d'),
@@ -134,6 +134,7 @@ function drawImage(ev) {
     img.src = src;
     img.onload = function () {
         getCanvasSize();
+        eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 10) + ')'");
         ctx.drawImage(img, (canvas2.width / 2 - applyImgWidth / 2), (canvas2.height / 2 - applyImgHeight / 2), applyImgWidth, applyImgHeight);
         url.revokeObjectURL(src);
     }
@@ -148,8 +149,7 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 function drawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 10) + ')'");
+    ctx.clearRect(0, 0, applyImgWidth, applyImgHeight);
     drawImage();
 }
 
