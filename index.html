@@ -26,6 +26,7 @@
                  <input type='file' onchange="readURL(this);" accept="image/*" id="inputIMG"/>
                  <br>
                  <img id="uploadedImage" src="#" alt="your image" />
+                 <p id="preview">PREVIEW</p>
              </div>
              <div class="editor">
                  <p>filters</p>
@@ -43,8 +44,15 @@
                  <p id="outputBrightness"></p>
                  <input type="range" min="0" max="50" value="10" class="slider" id="sliderContrast">Contrast
                  <p id="outputContrast"></p>
-                 <input type="range" min="0" max="10" value="10" class="slider" id="sliderOpacity">Opacity
+                 <input type="range" min="0" max="100" value="100" class="slider" id="sliderOpacity">Opacity
                  <p id="outputOpacity"></p>
+             </div>
+             <div class="resize">
+                 <p>resize</p>
+                 <input onchange="changeSize(1)" id="resize-width" type="number" min="0" max="4000" value="0">width
+                 <input onchange="changeSize(2)" id="resize-height" type="number" min="0" max="4000" value="0">height
+                 <br><br>
+                 <button onclick="changeSize(3)">reset size</button>
              </div>
              <div class="submit">
                  <button id="btn-submit" onclick="submit();">submit image</button>
@@ -55,6 +63,7 @@
         <!--<img src="sample.png"/>
         -->
         <canvas id="canvas"></canvas>
+        <br>
         <br>
      </div>
 </body>
@@ -69,17 +78,19 @@
 
 .master { text-align: center; }
 
-.bk { height: auto; padding: 20px; background: #eeeeee; margin-top: 1%; }
+.bk { height: auto; padding: 20px; background: #eeeeee; }
 
 html { background: #fff; }
 
-.uploader, .editor { display: inline-block; border: 1px dashed #b1b1b1; padding: 5px; vertical-align: top; }
+.uploader, .editor, .resize { display: inline-block; border: 1px dashed #b1b1b1; padding: 5px; vertical-align: top; position: relative; }
 
 .submit { max-width: 104px; margin-top: 25px; border: 1px solid green; vertical-align: top; padding: none !important; margin-left: auto; margin-right: auto; }
 
-.top { text-align: center; margin-top: 6%; font-size: 35px; }
+.top { text-align: center; margin-top: 3%; font-size: 35px; }
 
 #canvas { border: 2px dashed gray; }
+
+#preview { display: none; position: absolute; top: 8%; right: 8%; background: darkred; color: white; padding: 5px; opacity: 0.7; }
 
 </style>
 

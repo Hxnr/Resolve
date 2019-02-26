@@ -6,10 +6,13 @@ var saturateAmt = 1;
 var hueAmt = 0;
 var brightnessAmt = 10;
 var contrastAmt = 10;
-var opacityAmt = 10;
+var opacityAmt = 100;
 
 var applyImgHeight = 0;
 var applyImgWidth = 0;
+
+var originalWidth = 0;
+var originalHeight = 0;
 
 function readURL(input) {
     if (input.files && input.files[0]) {
@@ -20,8 +23,6 @@ function readURL(input) {
             scaleImage.onload = function () {
                 scaleFactor = this.height / this.width;
                 console.log("Scale Factor: " + scaleFactor);
-                
-                
             };
             $('#uploadedImage')
                 .attr('src', e.target.result)
@@ -29,12 +30,15 @@ function readURL(input) {
                 .width(this.width * scaleFactor);
                 applyImgHeight = ($('#uploadedImage').height());
                 applyImgWidth = ($('#uploadedImage').width());
+                originalHeight = ($('#uploadedImage').height());
+                originalWidth = ($('#uploadedImage').width());
+                document.getElementById("resize-width").value = applyImgWidth;
+                document.getElementById("resize-height").value = applyImgHeight;
         };
-        
         reader.readAsDataURL(input.files[0]);
     }
     $('.submit').css('display', 'block');
-    
+    $('#preview').css('display', 'block');
 }
 
 /*Sepia*/
@@ -118,12 +122,12 @@ sliderOpacity.oninput = function () {
 }
 
 function runImageFilter() {
-    $('#uploadedImage').css('filter', 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 10) + ')');
+    $('#uploadedImage').css('filter', 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')');
 }
 
 var canvas2 = document.getElementsByTagName('canvas')[0];
-canvas2.height = 600;
-canvas2.width = 600;
+canvas2.height = 400;
+canvas2.width = 400;
 
 function drawImage(ev) {
     var ctx = document.getElementById('canvas').getContext('2d'),
@@ -134,7 +138,7 @@ function drawImage(ev) {
     img.src = src;
     img.onload = function () {
         getCanvasSize();
-        eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 10) + ')'");
+        eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')'");
         ctx.drawImage(img, (canvas2.width / 2 - applyImgWidth / 2), (canvas2.height / 2 - applyImgHeight / 2), applyImgWidth, applyImgHeight);
         url.revokeObjectURL(src);
     }
@@ -143,8 +147,8 @@ function drawImage(ev) {
 function getCanvasSize() {
     applyImgHeight = ($('#uploadedImage').height());
     applyImgWidth = ($('#uploadedImage').width());
-    canvas2.width = applyImgWidth+100;
-    canvas2.height = applyImgHeight+100;
+    canvas2.width = applyImgWidth;
+    canvas2.height = applyImgHeight;
 }
 
 var canvas = document.getElementById('canvas');
@@ -157,4 +161,22 @@ function drawCanvas() {
 
 function submit() {
     drawCanvas();
+}
+
+function changeSize(x) {
+    if (x == 1) {
+        $('#uploadedImage').width(document.getElementById("resize-width").value);
+        applyImgWidth = ($('#uploadedImage').width());
+    }
+    else if (x == 2) {
+        $('#uploadedImage').height(document.getElementById("resize-height").value);
+        applyImgHeight = ($('#uploadedImage').height());
+    }
+    else if (x == 3) {
+        $('#uploadedImage').height(originalHeight).width(originalWidth);
+        applyImgHeight = ($('#uploadedImage').height());
+        applyImgWidth = ($('#uploadedImage').width());
+        document.getElementById("resize-width").value = applyImgWidth;
+        document.getElementById("resize-height").value = applyImgHeight;
+    }
 }
