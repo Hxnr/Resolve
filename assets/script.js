@@ -14,6 +14,8 @@ var applyImgWidth = 0;
 var originalWidth = 0;
 var originalHeight = 0;
 
+var load = true;
+
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -22,18 +24,34 @@ function readURL(input) {
             scaleImage.src = e.target.result;
             scaleImage.onload = function () {
                 scaleFactor = this.height / this.width;
+                console.log("Image Resolution: " + (this.width) + "x" + (this.height));
                 console.log("Scale Factor: " + scaleFactor);
-            };
-            $('#uploadedImage')
-                .attr('src', e.target.result)
-                .height(500)
-                .width(this.width * scaleFactor);
+                if (scaleFactor < 0.3) {
+                    $('#uploadedImage')
+                        .attr('src', e.target.result)
+                        .height(300)
+                        .width(300 / scaleFactor);
+                }
+                else if (scaleFactor < 0.45) {
+                    $('#uploadedImage')
+                        .attr('src', e.target.result)
+                        .height(430)
+                        .width(430 / scaleFactor);
+                }
+                else {
+                    $('#uploadedImage')
+                        .attr('src', e.target.result)
+                        .height(500)
+                        .width(500 / scaleFactor);
+                }
                 applyImgHeight = ($('#uploadedImage').height());
                 applyImgWidth = ($('#uploadedImage').width());
                 originalHeight = ($('#uploadedImage').height());
                 originalWidth = ($('#uploadedImage').width());
                 document.getElementById("resize-width").value = applyImgWidth;
                 document.getElementById("resize-height").value = applyImgHeight;
+            };
+
         };
         reader.readAsDataURL(input.files[0]);
     }
