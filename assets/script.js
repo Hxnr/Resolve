@@ -14,8 +14,10 @@ var applyImgWidth = 0;
 var originalWidth = 0;
 var originalHeight = 0;
 
-var load = true;
+var endWidth = 0;
+var endHeight = 0;
 
+var pgwidth; 
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -23,33 +25,36 @@ function readURL(input) {
             var scaleImage = new Image();
             scaleImage.src = e.target.result;
             scaleImage.onload = function () {
-                scaleFactor = this.height / this.width;
+                scaleFactor = this.width / this.height;
                 console.log("Image Resolution: " + (this.width) + "x" + (this.height));
                 console.log("Scale Factor: " + scaleFactor);
-                if (scaleFactor < 0.3) {
+                pgwidth = $(window).width();
+                endWidth = this.width;
+                endHeight = this.height;
+                originalWidth = this.width;
+                originalHeight = this.height;
+                if ((scaleFactor < 0.4) || (pgwidth < 500)) {
                     $('#uploadedImage')
                         .attr('src', e.target.result)
-                        .height(300)
-                        .width(300 / scaleFactor);
+                        .width(300)
+                        .height(300 / scaleFactor);
                 }
-                else if (scaleFactor < 0.45) {
+                else if ((scaleFactor < 0.6) || (pgwidth < 1000)) {
                     $('#uploadedImage')
                         .attr('src', e.target.result)
-                        .height(430)
-                        .width(430 / scaleFactor);
+                        .width(430)
+                        .height(430 / scaleFactor);
                 }
                 else {
                     $('#uploadedImage')
                         .attr('src', e.target.result)
-                        .height(500)
-                        .width(500 / scaleFactor);
+                        .width(500)
+                        .height(500 / scaleFactor);
                 }
                 applyImgHeight = ($('#uploadedImage').height());
                 applyImgWidth = ($('#uploadedImage').width());
-                originalHeight = ($('#uploadedImage').height());
-                originalWidth = ($('#uploadedImage').width());
-                document.getElementById("resize-width").value = applyImgWidth;
-                document.getElementById("resize-height").value = applyImgHeight;
+                document.getElementById("resize-width").value = endWidth;
+                document.getElementById("resize-height").value = endHeight;
             };
 
         };
@@ -155,18 +160,16 @@ function drawImage(ev) {
         src = url.createObjectURL(f);
     img.src = src;
     img.onload = function () {
-        getCanvasSize();
+        getEndCanvasSize();
         eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')'");
-        ctx.drawImage(img, (canvas2.width / 2 - applyImgWidth / 2), (canvas2.height / 2 - applyImgHeight / 2), applyImgWidth, applyImgHeight);
+        ctx.drawImage(img, (canvas2.width / 2 - endWidth / 2), (canvas2.height / 2 - endHeight / 2), endWidth, endHeight);
         url.revokeObjectURL(src);
     }
 }
 
-function getCanvasSize() {
-    applyImgHeight = ($('#uploadedImage').height());
-    applyImgWidth = ($('#uploadedImage').width());
-    canvas2.width = applyImgWidth;
-    canvas2.height = applyImgHeight;
+function getEndCanvasSize() {
+    canvas2.width = endWidth;
+    canvas2.height = endHeight;
 }
 
 var canvas = document.getElementById('canvas');
@@ -183,18 +186,56 @@ function submit() {
 
 function changeSize(x) {
     if (x == 1) {
-        $('#uploadedImage').width(document.getElementById("resize-width").value);
-        applyImgWidth = ($('#uploadedImage').width());
+        endWidth = document.getElementById("resize-width").value;
     }
     else if (x == 2) {
-        $('#uploadedImage').height(document.getElementById("resize-height").value);
-        applyImgHeight = ($('#uploadedImage').height());
+        endHeight = document.getElementById("resize-height").value;
     }
     else if (x == 3) {
-        $('#uploadedImage').height(originalHeight).width(originalWidth);
-        applyImgHeight = ($('#uploadedImage').height());
-        applyImgWidth = ($('#uploadedImage').width());
-        document.getElementById("resize-width").value = applyImgWidth;
-        document.getElementById("resize-height").value = applyImgHeight;
+        document.getElementById("resize-width").value = originalWidth;
+        document.getElementById("resize-height").value = originalHeight;
     }
 }
+
+var zoomamt = 50;
+function zoom(x) {
+    if (x == 1) {
+        zoomamt++;
+        if (zoomamt > 50) {
+            zoomamt--; $('#error-zoom-1').css('display', 'block');
+        }
+        $("#uploadedImage").css('transform', 'scale(' + zoomamt/50 + ')');
+    }
+    else if (x == 2) {
+        zoomamt--;
+        if (zoomamt < 10) {
+            zoomamt++; $('#error-zoom-2').css('display', 'block');
+        }
+        $("#uploadedImage").css('transform', 'scale(' + zoomamt/50 + ')');
+    }
+}
+
+window.addEventListener('wheel', function (e) {
+    if (e.deltaY < 0) {
+        if ($('#uploadedImage').is(":hover")) {
+            if (e.shiftKey) {
+                zoomamt++;
+                if(zoomamt > 50) {
+                    zoomamt--; $('#error-zoom-1').css('display', 'block');
+                }
+                $("#uploadedImage").css('transform', 'scale(' + zoomamt/50 + ')');
+            }
+        }
+    }
+    if (e.deltaY > 0) {
+        if ($('#uploadedImage').is(":hover")) {
+            if (e.shiftKey) {
+                zoomamt--; 
+                if (zoomamt < 10) {
+                    zoomamt++; $('#error-zoom-2').css('display', 'block');
+                }
+                $("#uploadedImage").css('transform', 'scale(' + zoomamt/50 + ')');
+            }
+        }
+    }
+});
