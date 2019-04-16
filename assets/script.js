@@ -207,6 +207,7 @@ function drawImage(ev) {
             ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5);
         } else {
             ctx.drawImage(img, (canvas2.width / 2 - endWidth / 2), (canvas2.height / 2 - endHeight / 2), canvas2.width, canvas2.height);
+        }
             //window.open(canvas2.toDataURL("image/png"), '_blank');
             // ^^ Broken on chrome as it blocks toDataURL. 
         url.revokeObjectURL(src);
@@ -401,7 +402,7 @@ function applyRotate() {
 function resetRotate() {
     rotateAmt = saveRotate; $('#modal-rotate').css('display', 'none'); runImageFilter();
 }
-document.getElementById("inputRotate").onchange = function() {
+function runRotate() {
     var inputRotate = document.getElementById("inputRotate");
     rotateAmt = inputRotate.value;
     if (rotateAmt < 0 || rotateAmt > 360) {
@@ -413,3 +414,4 @@ document.getElementById("inputRotate").onchange = function() {
         document.getElementById("rotateBTN").disabled = false;
     }
 }
+

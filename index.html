@@ -147,7 +147,7 @@
         <!--<input type="range" min="0" max="100" value="0" class="slider" id="sliderSepia">&nbsp;&nbsp;<p class="outputNumber"
           id="outputSepia"></p>
         -->
-          <input type="number" min="0" value="0" max="360" id="inputRotate">
+          <input type="number" min="0" value="0" max="360" id="inputRotate" onchange="runRotate();">
           <p class="modal-info">Value must be between 0 and 360</p>
           <p class="modal-warn"><span class="modal-bold">WARNING!</span> Rotation is not fully supported by Resolve and may not look accurate.</p>
           <button class="effect-btn eb1" onclick="resetRotate()">Cancel</button><button class="effect-btn eb2"
