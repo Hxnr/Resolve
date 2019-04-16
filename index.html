@@ -13,6 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
   <link rel="stylesheet" href="assets/style.css">
 </head>
 
@@ -31,9 +32,8 @@
           </button>
           <div class="dropdown-content">
             <a href="#" onclick="fileNew();">New</a>
-            <a href="#" onclick="document.getElementById('inputIMG').click()">Open</a>
-            <a href="#">Reset</a>
-            <a href="#">Save</a>
+            <a href="#" onclick="document.getElementById('inputIMG').click();">Open</a>
+            <a href="#">Save as...</a>
             <a href="#">Print</a>
           </div>
         </div>
@@ -50,7 +50,7 @@
           </button>
           <div class="dropdown-content">
             <a href="#">Resize</a>
-            <a href="#">Rotate</a>
+            <a href="#" onclick="openRotate();">Rotate</a>
             <a href="#">Flip</a>
           </div>
         </div>
@@ -58,23 +58,23 @@
           <button class="tablinks">View
           </button>
           <div class="dropdown-content">
-            <a href="#">Zoom in</a>
-            <a href="#">Zoom out</a>
-            <a href="#">Ruler</a>
-            <a href="#">Unit</a>
+            <a href="#" onclick="zoom(1);">Zoom in</a>
+            <a href="#" onclick="zoom(2);">Zoom out</a>
+            <a id="rulerbk" href="#" onclick="ruler();">Ruler</a>
+            <a href="#">Browser Compatibility</a>
           </div>
         </div>
         <div class="dropdown">
           <button class="tablinks">Effects
           </button>
           <div class="dropdown-content">
-            <a href="#">Sepia</a>
-            <a href="#">Blur</a>
-            <a href="#">Grayscale</a>
-            <a href="#">Saturate</a>
-            <a href="#">Hue/Colors</a>
-            <a href="#">Brightness/Contrast</a>
-            <a href="#">Opacity</a>
+            <a href="#" onclick="openSepia();">Sepia</a>
+            <a href="#" onclick="openBlur();">Blur</a>
+            <a href="#" onclick="openGrayscale();">Grayscale</a>
+            <a href="#" onclick="openSaturate();">Saturate</a>
+            <a href="#" onclick="openHue();">Hue/Colors</a>
+            <a href="#" onclick="openBrightnessContrast();">Brightness/Contrast</a>
+            <a href="#" onclick="openOpacity();">Opacity</a>
           </div>
         </div>
         <div class="dropdown">
@@ -98,8 +98,144 @@
       <i class="fa fa-cloud-upload"></i>
     </div>
   </div>
+      <p class="ruler-horizontal">┃ ╻ ╻ ╻ 0 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 1 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 2 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 3 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 4 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 5 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 6 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 7 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 8 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 9 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 10 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 11 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 12 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 13 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 14 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 15 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 16 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 17 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 18 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 19 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 20 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 21 ╻ ╻ ┃ ╻ ╻ ╻ 22 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 23 ╻ ╻ ╻ ┃</p>
+      <p class="ruler-vertical">┃ ╻ ╻ ╻ 0 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 1 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 2 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 3 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 4 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 5 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 6 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 7 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 8 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 9 ╻ ╻ ╻ ┃</p>
   <br><br><br><br><br><br>
+  
+<div class="footer">
+  <div class="footer-left">
+    <p id="footer-text">&copy; Resolve, 2019</p>
+  </div>
+  <p class="footer-space-left">&nbsp;</p>
+  <div class="footer-left">
+    <p id="footer-text">Resolve is a creation by Henry Jack</p>
+  </div>
+  <p class="footer-space-left">&nbsp;</p>
+  <div class="footer-left">
+    <p id="footer-text">v 0.1</p>
+  </div>
+  <div class="footer-section footer-right">
+    <i class="fas fa-search-minus footer-icon"></i><input type="range" min="1" max="25" value="25" class="slider" id="zoomslide"><i class="fas fa-search-plus footer-icon"></i>
+  </div>
+  <p class="footer-space-right">&nbsp;</p>
+  <div class="footer-section footer-right">
+    <i class="fas fa-mouse-pointer footer-icon"></i>
+    <p id="footer-coordy">mouse.y</p>
+    <p id="footer-coordx">mouse.x,&nbsp;</p>
+  </div>
+  <p class="footer-space-right">&nbsp;</p>
+  <div class="footer-section footer-right">
+    <i class="fas fa-ruler-combined footer-icon"></i>
+    <p id="footer-imgheight">0</p>
+    <p id="footer-imgwidth">0 x&nbsp;</p>
+  </div>
+  <p class="footer-space-right">&nbsp;</p>
+  <div class="footer-section footer-right">
+    <i class="far fa-bookmark footer-icon"></i>
+    <p id="footer-origheight">0</p>
+    <p id="footer-origwidth">0 x&nbsp;</p>
+  </div>
+</div>
+
   <div class="master">
+
+    <!-- Rotate -->
+    <div class="modal-effect" id="modal-rotate">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Rotate</p>
+        <!--<input type="range" min="0" max="100" value="0" class="slider" id="sliderSepia">&nbsp;&nbsp;<p class="outputNumber"
+          id="outputSepia"></p>
+        -->
+          <input type="number" min="0" value="0" max="360" id="inputRotate">
+          <p class="modal-info">Value must be between 0 and 360</p>
+          <p class="modal-warn"><span class="modal-bold">WARNING!</span> Rotation is not fully supported by Resolve and may not look accurate.</p>
+          <button class="effect-btn eb1" onclick="resetRotate()">Cancel</button><button class="effect-btn eb2"
+          onclick="applyRotate()" id="rotateBTN">Apply</button><br>
+      </div>
+    </div>
+
+    <!-- Sepia -->
+    <div class="modal-effect" id="modal-sepia">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Sepia</p>
+        <input type="range" min="0" max="100" value="0" class="slider" id="sliderSepia">&nbsp;&nbsp;<p class="outputNumber" id="outputSepia"></p>
+        <br><button class="effect-btn eb1" onclick="resetSepia()">Cancel</button><button class="effect-btn eb2" onclick="applySepia()">Apply</button><br>
+      </div>    
+    </div>
+
+    <!-- Blur -->
+    <div class="modal-effect" id="modal-blur">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Blur</p>
+        <input type="range" min="0" max="100" value="0" class="slider" id="sliderBlur">&nbsp;&nbsp;<p class="outputNumber" id="outputBlur"></p>
+        <br><button class="effect-btn eb1" onclick="resetBlur()">Cancel</button><button class="effect-btn eb2" onclick="applyBlur()">Apply</button><br>
+      </div>    
+    </div>
+
+    <!-- Grayscale -->
+    <div class="modal-effect" id="modal-grayscale">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Grayscale</p>
+        <input type="range" min="0" max="10" value="0" class="slider" id="sliderGrayscale">&nbsp;&nbsp;<p class="outputNumber" id="outputGrayscale"></p>
+        <br><button class="effect-btn eb1" onclick="resetGrayscale()">Cancel</button><button class="effect-btn eb2" onclick="applyGrayscale()">Apply</button><br>
+      </div>    
+    </div>
+
+    <!-- Saturate -->
+    <div class="modal-effect" id="modal-saturate">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Saturate</p>
+        <input type="range" min="1" max="10" value="1" class="slider" id="sliderSaturate">&nbsp;&nbsp;<p
+          class="outputNumber" id="outputSaturate"></p>
+        <br><button class="effect-btn eb1" onclick="resetSaturate()">Cancel</button><button class="effect-btn eb2"
+          onclick="applySaturate()">Apply</button><br>
+      </div>
+    </div>
+
+    <!-- Hue -->
+    <div class="modal-effect" id="modal-hue">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Hue</p>
+        <input type="range" min="0" max="100" value="0" class="slider" id="sliderHue">&nbsp;&nbsp;<p
+          class="outputNumber" id="outputHue"></p>
+        <br><button class="effect-btn eb1" onclick="resetHue()">Cancel</button><button class="effect-btn eb2"
+          onclick="applyHue()">Apply</button><br>
+      </div>
+    </div>
+
+    <!-- Brightness / Contrast -->
+    <div class="modal-effect" id="modal-brightnesscontrast">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Brightness</p>
+        <input type="range" min="0" max="50" value="10" class="slider" id="sliderBrightness">&nbsp;&nbsp;<p
+          class="outputNumber" id="outputBrightness"></p>
+          <p class="section-title">Contrast</p>
+        <input type="range" min="0" max="50" value="10" class="slider" id="sliderContrast">&nbsp;&nbsp;<p
+          class="outputNumber" id="outputContrast"></p>
+        <br><button class="effect-btn eb1" onclick="resetBrightnessContrast()">Cancel</button><button class="effect-btn eb2"
+          onclick="applyBrightnessContrast()">Apply</button><br>
+      </div>
+    </div>
+
+    <!-- Opacity -->
+    <div class="modal-effect" id="modal-opacity">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Opacity</p>
+        <input type="range" min="0" max="100" value="100" class="slider" id="sliderOpacity">&nbsp;&nbsp;<p class="outputNumber"
+          id="outputOpacity"></p>
+        <br><button class="effect-btn eb1" onclick="resetOpacity()">Cancel</button><button class="effect-btn eb2"
+          onclick="applyOpacity()">Apply</button><br>
+      </div>
+    </div>
+
     <div class="bk">
       <div class="uploader">
         <div class="zaz">
