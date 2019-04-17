@@ -59,8 +59,13 @@ function readURL(input) {
             scaleImage.src = e.target.result;
             scaleImage.onload = function () {
                 scaleFactor = this.width / this.height;
+                console.log("---------------------------------")
+                console.log(input.files[0].name);
                 console.log("Image Resolution: " + (this.width) + "x" + (this.height));
                 console.log("Scale Factor: " + scaleFactor);
+                console.log("---------------------------------")
+                document.getElementById("proj-title").value = (input.files[0].name);            
+                resizable(document.getElementById('proj-title'), 7);   
                 pgwidth = $(window).width();
                 endWidth = this.width;
                 endHeight = this.height;
@@ -207,7 +212,7 @@ sliderOpacity.oninput = function () {
 var sliderZoom = document.getElementById("zoomslide");
 sliderZoom.oninput = function () {
     zoomamt = this.value;
-    $("#uploadedImage").css('transform', 'scale(' + zoomamt / 25 + ')');
+    $("#uploadedImage").css('zoom', zoomamt / 25);
 }
 
 function runImageFilter() {
@@ -228,7 +233,9 @@ function drawImage(ev) {
         if (isRotated) {
             ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
             ctx.rotate(rotateAmt * Math.PI / 180);
-            ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5);
+            ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5, canvas2.width, canvas2.height);
+            $('#canvas').css('display', 'none');
+            save();
         } else {
             if (isFlippedHorizontal) {
                 ctx.translate(canvas2.width, 0);
@@ -262,11 +269,16 @@ function drawCanvas() {
 function changeSize(x) {
     if (x == 1) {
         endWidth = document.getElementById("resize-width").value;
+        document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
     } else if (x == 2) {
         endHeight = document.getElementById("resize-height").value;
+        document.getElementById("footer-origheight").innerHTML = endHeight; 
     } else if (x == 3) {
         document.getElementById("resize-width").value = originalWidth;
         document.getElementById("resize-height").value = originalHeight;
+        document.getElementById("footer-origwidth").innerHTML = originalWidth + "&nbsp;x&nbsp;";
+        document.getElementById("footer-origheight").innerHTML = originalHeight; 
+        
     }
 }
 
@@ -277,14 +289,12 @@ function zoom(x) {
         zoomamt++;
         if (zoomamt > 25) {
             zoomamt--;
-            $('#error-zoom-1').css('display', 'block');
         }
         $("#uploadedImage").css('transform', 'scale(' + zoomamt / 25 + ')');
     } else if (x == 2) {
         zoomamt--;
         if (zoomamt < 5) {
             zoomamt++;
-            $('#error-zoom-2').css('display', 'block');
         }
         $("#uploadedImage").css('transform', 'scale(' + zoomamt / 25 + ')');
     }
@@ -297,7 +307,6 @@ window.addEventListener('wheel', function (e) {
                 zoomamt++;
                 if (zoomamt > 50) {
                     zoomamt--;
-                    $('#error-zoom-1').css('display', 'block');
                 }
                 $("#uploadedImage").css('transform', 'scale(' + zoomamt / 50 + ')');
             }
@@ -309,7 +318,6 @@ window.addEventListener('wheel', function (e) {
                 zoomamt--;
                 if (zoomamt < 10) {
                     zoomamt++;
-                    $('#error-zoom-2').css('display', 'block');
                 }
                 $("#uploadedImage").css('transform', 'scale(' + zoomamt / 50 + ')');
             }
@@ -327,6 +335,8 @@ function fileNew() {
     $('#formats').css('display', 'block');
     $('.master').css('border', '1px solid rgb(156, 156, 156)');
     resetAll();
+    document.getElementById("proj-title").value = "New project";
+    resizable(document.getElementById('proj-title'), 7);           
 }
 
 function resetAll() {
@@ -395,6 +405,13 @@ function openOpacity() { previousOpacity = saveOpacity; $('#modal-opacity').css(
 function applyOpacity() { $('#modal-opacity').css('display', 'none'); }
 function resetOpacity() { opacityAmt = saveOpacity; $('#modal-opacity').css('display', 'none'); var outputOpacity = document.getElementById("outputOpacity");
 var sliderOpacity = document.getElementById("sliderOpacity"); outputOpacity.innerHTML = opacityAmt; sliderOpacity.value = opacityAmt; runImageFilter();
+}
+
+function closeResize() {
+    $('#modal-resize').css('display', 'none');
+}
+function openResize() {
+    $('#modal-resize').css('display', 'block');
 }
 
 function ruler() {
@@ -489,7 +506,7 @@ function save() {
     link.innerHTML = 'download image';
     link.addEventListener('click', function (ev) {
         link.href = canvas2.toDataURL();
-        link.download = "image.png";
+        link.download = document.getElementById("proj-title").value;
     }, false);
     document.body.appendChild(link);
     link.click();
@@ -534,3 +551,13 @@ function undo() {
             break;
     }
 }
+
+function resizable(el, factor) {
+    var int = Number(factor) || 7.7;
+    function resizeInput() { el.style.width = ((el.value.length + 5) * int) + 'px' }
+    var e = 'keyup,keypress,focus,blur,change'.split(',');
+    for (var i in e) el.addEventListener(e[i], resizeInput, false);
+    resizeInput();
+   // alert(1);
+}
+resizable(document.getElementById('proj-title'), 7);
