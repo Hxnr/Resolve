@@ -20,12 +20,13 @@
 <body>
   <img class="imglogo" src="logo.png">
   <div class="abc">
-    <p class="ztitle">New project</p>
+
+    <input type="text" name="projectname" class="ztitle" value="New project" id="proj-title" style="text-align: left;"><i class="fas fa-pen edit-title"></i>
     <div class="nav-middle">
       <i class="rightnav fas fa-question"></i>
       <i class="rightnav fas fa-cog"></i>
       <button class="zbtn" onclick="submit();">Save Image</button>
-      <button class="zbtn2">Reset Image</button>
+      <button class="zbtn2" onclick="fileNew();">Reset Image</button>
       <div class="tab">
         <div class="dropdown">
           <button class="tablinks">File
@@ -49,7 +50,7 @@
           <button class="tablinks">Image
           </button>
           <div class="dropdown-content">
-            <a href="#">Resize</a>
+            <a href="#" onclick="openResize();">Resize</a>
             <a href="#" onclick="openRotate();">Rotate</a>
             <a href="#" id="horizbk" onclick="runFlip(1);">Horizontal flip</a>
             <a href="#" id="vertbk" onclick="runFlip(2);">Vertical flip</a>
@@ -91,12 +92,12 @@
     </div>
     <div class="nav2">
       &nbsp;&nbsp;&nbsp;
-      <i class="fas fa-undo"></i>&nbsp;&nbsp;&nbsp;
-      <i class="fas fa-redo"></i>&nbsp;&nbsp;&nbsp;
-      <i class="fas fa-save"></i>&nbsp;&nbsp;&nbsp;
-      <i class="fa fa-print"></i>&nbsp;&nbsp;&nbsp;
-      <i class="fa fa-copy"></i>&nbsp;&nbsp;&nbsp;
-      <i class="fa fa-cloud-upload"></i>
+      <i class="fas fa-undo navicon" onclick="undo();" title="Undo"></i>&nbsp;&nbsp;&nbsp;
+      <i class="fas fa-redo navicon" title="Redo"></i>&nbsp;&nbsp;&nbsp;
+      <i class="fas fa-save navicon" onclick="submit();" title="Save"></i>&nbsp;&nbsp;&nbsp;
+      <i class="fa fa-print navicon" title="Print"></i>&nbsp;&nbsp;&nbsp;
+      <i class="fa fa-copy navicon" title="Copy"></i>&nbsp;&nbsp;&nbsp;
+      <i class="far fa-file navicon" title="New" onclick=fileNew();></i>
     </div>
   </div>
       <p class="ruler-horizontal">┃ ╻ ╻ ╻ 0 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 1 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 2 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 3 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 4 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 5 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 6 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 7 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 8 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 9 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 10 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 11 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 12 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 13 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 14 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 15 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 16 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 17 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 18 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 19 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 20 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 21 ╻ ╻ ┃ ╻ ╻ ╻ 22 ╻ ╻ ╻ ┃ ╻ ╻ ╻ 23 ╻ ╻ ╻ ┃</p>
@@ -131,7 +132,7 @@
     <p id="footer-imgwidth">0 x&nbsp;</p>
   </div>
   <p class="footer-space-right">&nbsp;</p>
-  <div class="footer-section footer-right" title="Original image size">
+  <div class="footer-section footer-right" title="Size after saving">
     <i class="far fa-bookmark footer-icon"></i>
     <p id="footer-origheight">0</p>
     <p id="footer-origwidth">0 x&nbsp;</p>
@@ -237,6 +238,20 @@
       </div>
     </div>
 
+    <!-- Resize -->
+    <div class="modal-effect" id="modal-resize">
+      <div class="modal-effect-content">
+        <br>
+        <p class="section-title">Resize</p>
+        <input onchange="changeSize(1)" id="resize-width" type="number" min="0" max="4000" value="0">&nbsp;Width
+        <input onchange="changeSize(2)" id="resize-height" type="number" min="0" max="4000" value="0">&nbsp;Height
+        <br>
+        <p class="tip">Size will apply after submit</p>
+        <button class="effect-btn eb1" onclick="changeSize(3);closeResize();">Cancel</button><button class="effect-btn eb2"
+          onclick="closeResize();">Apply</button><br>
+      </div>
+    </div>
+
     <div class="bk">
       <div class="uploader">
         <div class="zaz">
@@ -254,63 +269,8 @@
         <!--  <p class="error" id="error-gif">GIFs won't appear animated after submission</p> -->
       </div>
       <canvas id="canvas"></canvas>
-      <div class="disable">
-        <div class="editor">
-          <p class="section-title">Filters</p>
-          <input type="range" min="0" max="100" value="0" class="slider" id="sliderSepia"><br>Sepia
-          <p class="outputNumber" id="outputSepia"></p>
-          <br>
-          <input type="range" min="0" max="100" value="0" class="slider" id="sliderBlur"><br>Blur
-          <p class="outputNumber" id="outputBlur"></p>
-          <br>
-          <input type="range" min="0" max="10" value="0" class="slider" id="sliderGrayscale"><br>Gray
-          <p class="outputNumber" id="outputGrayscale"></p>
-          <br>
-          <input type="range" min="1" max="10" value="1" class="slider" id="sliderSaturate"><br>Saturate
-          <p class="outputNumber" id="outputSaturate"></p>
-          <br>
-          <input type="range" min="0" max="100" value="0" class="slider" id="sliderHue"><br>Hue
-          <p class="outputNumber" id="outputHue"></p>
-          <br>
-          <input type="range" min="0" max="50" value="10" class="slider" id="sliderBrightness"><br>Brightness
-          <p class="outputNumber" id="outputBrightness"></p>
-          <br>
-          <input type="range" min="0" max="50" value="10" class="slider" id="sliderContrast"><br>Contrast
-          <p class="outputNumber" id="outputContrast"></p>
-          <br>
-          <input type="range" min="0" max="100" value="100" class="slider" id="sliderOpacity"><br>Opacity
-          <p class="outputNumber" id="outputOpacity"></p>
-          <br><br>
-        </div>
-        <div class="resize">
-          <p class="section-title">Resize</p>
-          <input onchange="changeSize(1)" id="resize-width" type="number" min="0" max="4000" value="0">&nbsp;Width
-          <input onchange="changeSize(2)" id="resize-height" type="number" min="0" max="4000" value="0">&nbsp;Height
-          <p class="error" id="error-resize-1">Minimum size reached</p>
-          <p class="error" id="error-resize-2">Maximum size reached</p>
-          <br>
-          <p class="tip">Size will apply after submit</p>
-          <br>
-          <label class="reset-size" onclick="changeSize(3);"><i></i>&nbsp;Reset Size</label>
-          <br><br><br>
-          <p class="section-title">Zoom</p>
-          <label class="zoom" onclick="zoom(1);"><i class="zoom-icon fas fa-search-plus"></i>&nbsp;Zoom in</label>
-          <label class="zoom" onclick="zoom(2);"><i class="zoom-icon fas fa-search-minus"></i>&nbsp;Zoom out</label>
-          <p class="error" id="error-zoom-1">Maximum zoom amount reached</p>
-          <p class="error" id="error-zoom-2">Minimum zoom amount reached</p>
-          <p class="tip">You can hold <b>SHIFT</b> and <br>scroll wheel over the image to zoom</p>
-        </div>
-        <div class="submit">
-          <label class="custom-file-upload" onclick="submit();">Submit</label>
-        </div>
-        <hr>
-        <p class="section-title">Your image</p>
-        <br>
-        <br>
-      </div>
     </div>
-  </div>
-  <br><br>
+     
 </body>
 
 </html>

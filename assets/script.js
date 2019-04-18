@@ -50,6 +50,9 @@ var previousHue = 0;
 var previousBrightness = 0;
 var previousContrast = 0;
 var previousOpacity = 0;
+var previousRotate = 0;
+var previousWidth = 0;
+var previousHeight = 0;
 
 function readURL(input) {
     if (input.files && input.files[0]) {
@@ -59,8 +62,13 @@ function readURL(input) {
             scaleImage.src = e.target.result;
             scaleImage.onload = function () {
                 scaleFactor = this.width / this.height;
+                console.log("---------------------------------")
+                console.log(input.files[0].name);
                 console.log("Image Resolution: " + (this.width) + "x" + (this.height));
                 console.log("Scale Factor: " + scaleFactor);
+                console.log("---------------------------------")
+                document.getElementById("proj-title").value = (input.files[0].name);            
+                resizable(document.getElementById('proj-title'), 7);   
                 pgwidth = $(window).width();
                 endWidth = this.width;
                 endHeight = this.height;
@@ -207,7 +215,7 @@ sliderOpacity.oninput = function () {
 var sliderZoom = document.getElementById("zoomslide");
 sliderZoom.oninput = function () {
     zoomamt = this.value;
-    $("#uploadedImage").css('transform', 'scale(' + zoomamt / 25 + ')');
+    $("#uploadedImage").css('zoom', zoomamt / 25);
 }
 
 function runImageFilter() {
@@ -228,7 +236,9 @@ function drawImage(ev) {
         if (isRotated) {
             ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
             ctx.rotate(rotateAmt * Math.PI / 180);
-            ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5);
+            ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5, canvas2.width, canvas2.height);
+            $('#canvas').css('display', 'none');
+            save();
         } else {
             if (isFlippedHorizontal) {
                 ctx.translate(canvas2.width, 0);
@@ -260,13 +270,20 @@ function drawCanvas() {
 }
 
 function changeSize(x) {
+    previousAction = "resize";
     if (x == 1) {
+        previousWidth = endWidth;
         endWidth = document.getElementById("resize-width").value;
+        document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
     } else if (x == 2) {
+        previousWidth = endHeight;
         endHeight = document.getElementById("resize-height").value;
+        document.getElementById("footer-origheight").innerHTML = endHeight; 
     } else if (x == 3) {
         document.getElementById("resize-width").value = originalWidth;
         document.getElementById("resize-height").value = originalHeight;
+        document.getElementById("footer-origwidth").innerHTML = originalWidth + "&nbsp;x&nbsp;";
+        document.getElementById("footer-origheight").innerHTML = originalHeight; 
     }
 }
 
@@ -277,14 +294,12 @@ function zoom(x) {
         zoomamt++;
         if (zoomamt > 25) {
             zoomamt--;
-            $('#error-zoom-1').css('display', 'block');
         }
         $("#uploadedImage").css('transform', 'scale(' + zoomamt / 25 + ')');
     } else if (x == 2) {
         zoomamt--;
         if (zoomamt < 5) {
             zoomamt++;
-            $('#error-zoom-2').css('display', 'block');
         }
         $("#uploadedImage").css('transform', 'scale(' + zoomamt / 25 + ')');
     }
@@ -297,7 +312,6 @@ window.addEventListener('wheel', function (e) {
                 zoomamt++;
                 if (zoomamt > 50) {
                     zoomamt--;
-                    $('#error-zoom-1').css('display', 'block');
                 }
                 $("#uploadedImage").css('transform', 'scale(' + zoomamt / 50 + ')');
             }
@@ -309,7 +323,6 @@ window.addEventListener('wheel', function (e) {
                 zoomamt--;
                 if (zoomamt < 10) {
                     zoomamt++;
-                    $('#error-zoom-2').css('display', 'block');
                 }
                 $("#uploadedImage").css('transform', 'scale(' + zoomamt / 50 + ')');
             }
@@ -327,6 +340,12 @@ function fileNew() {
     $('#formats').css('display', 'block');
     $('.master').css('border', '1px solid rgb(156, 156, 156)');
     resetAll();
+    document.getElementById("proj-title").value = "New project";
+    resizable(document.getElementById('proj-title'), 7);          
+    document.getElementById("footer-origwidth").innerHTML = 0 + "&nbsp;x&nbsp;";
+    document.getElementById("footer-origheight").innerHTML = 0;
+    document.getElementById("footer-imgwidth").innerHTML = 0 + "&nbsp;x&nbsp;";
+    document.getElementById("footer-imgheight").innerHTML = 0; 
 }
 
 function resetAll() {
@@ -397,6 +416,13 @@ function resetOpacity() { opacityAmt = saveOpacity; $('#modal-opacity').css('dis
 var sliderOpacity = document.getElementById("sliderOpacity"); outputOpacity.innerHTML = opacityAmt; sliderOpacity.value = opacityAmt; runImageFilter();
 }
 
+function closeResize() {
+    $('#modal-resize').css('display', 'none');
+}
+function openResize() {
+    $('#modal-resize').css('display', 'block');
+}
+
 function ruler() {
     if (rulerOn) {
         $('.ruler-horizontal').css('display', 'none');
@@ -419,6 +445,7 @@ onmousemove = function (e) { document.getElementById("footer-coordx").innerHTML 
 
 /* Rotate */
 function openRotate() { 
+    previousRotate = saveRotate;
     $('#modal-rotate').css('display', 'block'); 
     var inputRotate = document.getElementById("inputRotate"); 
     saveRotate = inputRotate.value; 
@@ -430,7 +457,8 @@ function applyRotate() {
     } else {
         $('#modal-rotate').css('display', 'none'); 
         isRotated = true; 
-        $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)'); 
+        $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)');
+        previousAction = "rotate"; 
     }
 }
 function resetRotate() {
@@ -454,26 +482,22 @@ function runFlip(x) {
         if (isFlippedHorizontal) {
             isFlippedHorizontal = false;
             $("#uploadedImage").css('transform', 'scaleX(1)');
-            $('#horizbk').css('background-color', 'inherit');
-            $('#horizbk').css('border', 'inherit');
+            previousAction = "flipHorizFalse";
         } else {
             isFlippedHorizontal = true;
             $("#uploadedImage").css('transform', 'scaleX(-1)');
-            $('#horizbk').css('background-color', 'rgb(191, 215, 224)');
-            $('#horizbk').css('border', '1px solid rgb(136, 173, 185)');
+            previousAction = "flipHorizTrue";
         } 
     } 
     else if (x == 2) { // vertical
         if (isFlippedVertical) {
             isFlippedVertical = false;
             $("#uploadedImage").css('transform', 'scaleY(1)');
-            $('#vertbk').css('background-color', 'inherit');
-            $('#vertbk').css('border', 'inherit');
+            previousAction = "flipVertFalse";
         } else {
             isFlippedVertical = true;   
             $("#uploadedImage").css('transform', 'scaleY(-1)');
-            $('#vertbk').css('background-color', 'rgb(191, 215, 224)');
-            $('#vertbk').css('border', '1px solid rgb(136, 173, 185)');
+            previousAction = "flipVertTrue";
         } 
     }
 }
@@ -489,7 +513,7 @@ function save() {
     link.innerHTML = 'download image';
     link.addEventListener('click', function (ev) {
         link.href = canvas2.toDataURL();
-        link.download = "image.png";
+        link.download = document.getElementById("proj-title").value;
     }, false);
     document.body.appendChild(link);
     link.click();
@@ -532,5 +556,41 @@ function undo() {
             hueAmt = previousHue;
             runImageFilter();
             break;
+        case "rotate":
+            rotateAmt = previousRotate;
+            $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)');
+            runImageFilter();
+            break;
+        case "resize":
+            endWidth = previousWidth;
+            endHeight = previousHeight;
+            document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
+            document.getElementById("footer-origheight").innerHTML = endHeight; 
+            break;
+        case "flipHorizFalse":
+            isFlippedHorizontal = true;
+            $("#uploadedImage").css('transform', 'scaleX(-1)');
+            break;
+        case "flipHorizTrue":
+            isFlippedHorizontal = false;
+            $("#uploadedImage").css('transform', 'scaleX(1)');
+            break;
+        case "flipVertFalse":
+            isFlippedVertical = true;
+            $("#uploadedImage").css('transform', 'scaleY(-1)');
+            break;
+        case "flipVertTrue":
+            isFlippedVertical = false;
+            $("#uploadedImage").css('transform', 'scaleY(1)');
+            break;
     }
 }
+
+function resizable(el, factor) {
+    var int = Number(factor) || 7.7;
+    function resizeInput() { el.style.width = ((el.value.length + 5) * int) + 'px' }
+    var e = 'keyup,keypress,focus,blur,change'.split(',');
+    for (var i in e) el.addEventListener(e[i], resizeInput, false);
+    resizeInput();
+}
+resizable(document.getElementById('proj-title'), 7);
