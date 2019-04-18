@@ -269,63 +269,8 @@
         <!--  <p class="error" id="error-gif">GIFs won't appear animated after submission</p> -->
       </div>
       <canvas id="canvas"></canvas>
-      <div class="disable">
-        <div class="editor">
-          <p class="section-title">Filters</p>
-          <input type="range" min="0" max="100" value="0" class="slider" id="sliderSepia"><br>Sepia
-          <p class="outputNumber" id="outputSepia"></p>
-          <br>
-          <input type="range" min="0" max="100" value="0" class="slider" id="sliderBlur"><br>Blur
-          <p class="outputNumber" id="outputBlur"></p>
-          <br>
-          <input type="range" min="0" max="10" value="0" class="slider" id="sliderGrayscale"><br>Gray
-          <p class="outputNumber" id="outputGrayscale"></p>
-          <br>
-          <input type="range" min="1" max="10" value="1" class="slider" id="sliderSaturate"><br>Saturate
-          <p class="outputNumber" id="outputSaturate"></p>
-          <br>
-          <input type="range" min="0" max="100" value="0" class="slider" id="sliderHue"><br>Hue
-          <p class="outputNumber" id="outputHue"></p>
-          <br>
-          <input type="range" min="0" max="50" value="10" class="slider" id="sliderBrightness"><br>Brightness
-          <p class="outputNumber" id="outputBrightness"></p>
-          <br>
-          <input type="range" min="0" max="50" value="10" class="slider" id="sliderContrast"><br>Contrast
-          <p class="outputNumber" id="outputContrast"></p>
-          <br>
-          <input type="range" min="0" max="100" value="100" class="slider" id="sliderOpacity"><br>Opacity
-          <p class="outputNumber" id="outputOpacity"></p>
-          <br><br>
-        </div>
-        <div class="resize">
-          <p class="section-title">Resize</p>
-          <input onchange="changeSize(1)" id="resize-width" type="number" min="0" max="4000" value="0">&nbsp;Width
-          <input onchange="changeSize(2)" id="resize-height" type="number" min="0" max="4000" value="0">&nbsp;Height
-          <p class="error" id="error-resize-1">Minimum size reached</p>
-          <p class="error" id="error-resize-2">Maximum size reached</p>
-          <br>
-          <p class="tip">Size will apply after submit</p>
-          <br>
-          <label class="reset-size" onclick="changeSize(3);"><i></i>&nbsp;Reset Size</label>
-          <br><br><br>
-          <p class="section-title">Zoom</p>
-          <label class="zoom" onclick="zoom(1);"><i class="zoom-icon fas fa-search-plus"></i>&nbsp;Zoom in</label>
-          <label class="zoom" onclick="zoom(2);"><i class="zoom-icon fas fa-search-minus"></i>&nbsp;Zoom out</label>
-          <p class="error" id="error-zoom-1">Maximum zoom amount reached</p>
-          <p class="error" id="error-zoom-2">Minimum zoom amount reached</p>
-          <p class="tip">You can hold <b>SHIFT</b> and <br>scroll wheel over the image to zoom</p>
-        </div>
-        <div class="submit">
-          <label class="custom-file-upload" onclick="submit();">Submit</label>
-        </div>
-        <hr>
-        <p class="section-title">Your image</p>
-        <br>
-        <br>
-      </div>
     </div>
-  </div>
-  <br><br>
+     
 </body>
 
 </html>

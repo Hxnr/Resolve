@@ -50,6 +50,9 @@ var previousHue = 0;
 var previousBrightness = 0;
 var previousContrast = 0;
 var previousOpacity = 0;
+var previousRotate = 0;
+var previousWidth = 0;
+var previousHeight = 0;
 
 function readURL(input) {
     if (input.files && input.files[0]) {
@@ -267,10 +270,13 @@ function drawCanvas() {
 }
 
 function changeSize(x) {
+    previousAction = "resize";
     if (x == 1) {
+        previousWidth = endWidth;
         endWidth = document.getElementById("resize-width").value;
         document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
     } else if (x == 2) {
+        previousWidth = endHeight;
         endHeight = document.getElementById("resize-height").value;
         document.getElementById("footer-origheight").innerHTML = endHeight; 
     } else if (x == 3) {
@@ -278,7 +284,6 @@ function changeSize(x) {
         document.getElementById("resize-height").value = originalHeight;
         document.getElementById("footer-origwidth").innerHTML = originalWidth + "&nbsp;x&nbsp;";
         document.getElementById("footer-origheight").innerHTML = originalHeight; 
-        
     }
 }
 
@@ -336,7 +341,11 @@ function fileNew() {
     $('.master').css('border', '1px solid rgb(156, 156, 156)');
     resetAll();
     document.getElementById("proj-title").value = "New project";
-    resizable(document.getElementById('proj-title'), 7);           
+    resizable(document.getElementById('proj-title'), 7);          
+    document.getElementById("footer-origwidth").innerHTML = 0 + "&nbsp;x&nbsp;";
+    document.getElementById("footer-origheight").innerHTML = 0;
+    document.getElementById("footer-imgwidth").innerHTML = 0 + "&nbsp;x&nbsp;";
+    document.getElementById("footer-imgheight").innerHTML = 0; 
 }
 
 function resetAll() {
@@ -436,6 +445,7 @@ onmousemove = function (e) { document.getElementById("footer-coordx").innerHTML 
 
 /* Rotate */
 function openRotate() { 
+    previousRotate = saveRotate;
     $('#modal-rotate').css('display', 'block'); 
     var inputRotate = document.getElementById("inputRotate"); 
     saveRotate = inputRotate.value; 
@@ -447,7 +457,8 @@ function applyRotate() {
     } else {
         $('#modal-rotate').css('display', 'none'); 
         isRotated = true; 
-        $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)'); 
+        $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)');
+        previousAction = "rotate"; 
     }
 }
 function resetRotate() {
@@ -471,26 +482,22 @@ function runFlip(x) {
         if (isFlippedHorizontal) {
             isFlippedHorizontal = false;
             $("#uploadedImage").css('transform', 'scaleX(1)');
-            $('#horizbk').css('background-color', 'inherit');
-            $('#horizbk').css('border', 'inherit');
+            previousAction = "flipHorizFalse";
         } else {
             isFlippedHorizontal = true;
             $("#uploadedImage").css('transform', 'scaleX(-1)');
-            $('#horizbk').css('background-color', 'rgb(191, 215, 224)');
-            $('#horizbk').css('border', '1px solid rgb(136, 173, 185)');
+            previousAction = "flipHorizTrue";
         } 
     } 
     else if (x == 2) { // vertical
         if (isFlippedVertical) {
             isFlippedVertical = false;
             $("#uploadedImage").css('transform', 'scaleY(1)');
-            $('#vertbk').css('background-color', 'inherit');
-            $('#vertbk').css('border', 'inherit');
+            previousAction = "flipVertFalse";
         } else {
             isFlippedVertical = true;   
             $("#uploadedImage").css('transform', 'scaleY(-1)');
-            $('#vertbk').css('background-color', 'rgb(191, 215, 224)');
-            $('#vertbk').css('border', '1px solid rgb(136, 173, 185)');
+            previousAction = "flipVertTrue";
         } 
     }
 }
@@ -549,6 +556,33 @@ function undo() {
             hueAmt = previousHue;
             runImageFilter();
             break;
+        case "rotate":
+            rotateAmt = previousRotate;
+            $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)');
+            runImageFilter();
+            break;
+        case "resize":
+            endWidth = previousWidth;
+            endHeight = previousHeight;
+            document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
+            document.getElementById("footer-origheight").innerHTML = endHeight; 
+            break;
+        case "flipHorizFalse":
+            isFlippedHorizontal = true;
+            $("#uploadedImage").css('transform', 'scaleX(-1)');
+            break;
+        case "flipHorizTrue":
+            isFlippedHorizontal = false;
+            $("#uploadedImage").css('transform', 'scaleX(1)');
+            break;
+        case "flipVertFalse":
+            isFlippedVertical = true;
+            $("#uploadedImage").css('transform', 'scaleY(-1)');
+            break;
+        case "flipVertTrue":
+            isFlippedVertical = false;
+            $("#uploadedImage").css('transform', 'scaleY(1)');
+            break;
     }
 }
 
@@ -558,6 +592,5 @@ function resizable(el, factor) {
     var e = 'keyup,keypress,focus,blur,change'.split(',');
     for (var i in e) el.addEventListener(e[i], resizeInput, false);
     resizeInput();
-   // alert(1);
 }
 resizable(document.getElementById('proj-title'), 7);
