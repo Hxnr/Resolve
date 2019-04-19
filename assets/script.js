@@ -54,6 +54,8 @@ var previousRotate = 0;
 var previousWidth = 0;
 var previousHeight = 0;
 
+var saveImage = false;
+
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -232,12 +234,12 @@ function drawImage(ev) {
     img.src = src;
     img.onload = function () {
         getEndCanvasSize();
+       // $('#canvas').css('display', 'none');
         eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')'");
         if (isRotated) {
             ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
             ctx.rotate(rotateAmt * Math.PI / 180);
             ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5, canvas2.width, canvas2.height);
-            $('#canvas').css('display', 'none');
             save();
         } else {
             if (isFlippedHorizontal) {
@@ -249,8 +251,10 @@ function drawImage(ev) {
                 ctx.scale(1, -1);
             }
             ctx.drawImage(img, (canvas2.width / 2 - endWidth / 2), (canvas2.height / 2 - endHeight / 2), canvas2.width, canvas2.height);
-            $('#canvas').css('display', 'none');
-            save();
+            //$('#canvas').css('display', 'none');
+            if (saveImage) {
+                save();
+            }
         }
         url.revokeObjectURL(src);
     }
@@ -506,6 +510,7 @@ function submit() {
     canvas2.height = 400;
     canvas2.width = 400;
     drawCanvas();
+    saveImage = true;
 }
 
 function save() {
@@ -518,6 +523,21 @@ function save() {
     document.body.appendChild(link);
     link.click();
     $(link).css('display', 'none');
+}
+
+function copy() {
+    saveImage = false;
+  //  submit();
+    canvas2.height = 400;
+    canvas2.width = 400;
+    drawCanvas();
+    //alert("Because of security reasons, copying an image isn't available.");
+    $('#modal-copy').css('display', 'block');
+    $('#canvas').css('display', 'inline-block');
+}
+
+function closeCopy() {
+    $('#modal-copy').css('display', 'none');
 }
 
 function undo() {
@@ -594,3 +614,4 @@ function resizable(el, factor) {
     resizeInput();
 }
 resizable(document.getElementById('proj-title'), 7);
+

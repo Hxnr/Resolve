@@ -96,7 +96,7 @@
       <i class="fas fa-redo navicon" title="Redo"></i>&nbsp;&nbsp;&nbsp;
       <i class="fas fa-save navicon" onclick="submit();" title="Save"></i>&nbsp;&nbsp;&nbsp;
       <i class="fa fa-print navicon" title="Print"></i>&nbsp;&nbsp;&nbsp;
-      <i class="fa fa-copy navicon" title="Copy"></i>&nbsp;&nbsp;&nbsp;
+      <i class="fa fa-copy navicon" title="Copy" onclick="copy('uploadedImage');"></i>&nbsp;&nbsp;&nbsp;
       <i class="far fa-file navicon" title="New" onclick=fileNew();></i>
     </div>
   </div>
@@ -154,6 +154,16 @@
           <p class="modal-warn"><span class="modal-bold">WARNING!</span> Rotation is not fully supported by Resolve and may not look accurate.</p>
           <button class="effect-btn eb1" onclick="resetRotate()">Cancel</button><button class="effect-btn eb2"
           onclick="applyRotate()" id="rotateBTN">Apply</button><br>
+      </div>
+    </div>
+
+    <!-- Copy Error -->
+    <div class="modal-effect" id="modal-copy">
+      <div class="modal-effect-content">
+        <p class="section-title">Copy</p>
+        <p class="modal-info">Right click the image below and hit 'Copy'.</p>
+          <canvas id="canvas"></canvas>
+          <button class="effect-btn eb2" onclick="closeCopy()">Okay</button><br>
       </div>
     </div>
 
@@ -268,7 +278,6 @@
         <!--   <p id="preview">PREVIEW</p> -->
         <!--  <p class="error" id="error-gif">GIFs won't appear animated after submission</p> -->
       </div>
-      <canvas id="canvas"></canvas>
     </div>
      
 </body>
