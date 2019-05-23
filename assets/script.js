@@ -54,6 +54,29 @@ var previousRotate = 0;
 var previousWidth = 0;
 var previousHeight = 0;
 
+var restoreSepia = 0;
+var restoreBlur = 0;
+var restoreGrayscale = 0;
+var restoreSaturate = 0;
+var restoreHue = 0;
+var restoreBrightness = 0;
+var restoreContrast = 0;
+var restoreOpacity = 0;
+var restoreRotate = 0;
+var restoreWidth = 0;
+var restoreHeight = 0;
+
+var saveImage = false;
+
+var isUndone = false;
+
+var isDrawing = false;
+
+var isUploaded = false;
+
+
+runDrawing();
+
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -74,34 +97,12 @@ function readURL(input) {
                 endHeight = this.height;
                 originalWidth = this.width;
                 originalHeight = this.height;
-                document.getElementById("footer-origwidth").innerHTML = originalWidth + "&nbsp;x&nbsp;";
-                document.getElementById("footer-origheight").innerHTML = originalHeight; 
-                if ((scaleFactor < 0.4) || (pgwidth < 500)) {
-                    $('#uploadedImage')
-                        .attr('src', e.target.result)
-                        .width(300)
-                        .height(300 / scaleFactor);
-                } else if ((scaleFactor < 0.6) || (pgwidth < 1000)) {
-                    $('#uploadedImage')
-                        .attr('src', e.target.result)
-                        .width(430)
-                        .height(430 / scaleFactor);
-                } else {
-                    $('#uploadedImage')
-                        .attr('src', e.target.result)
-                        .width(500)
-                        .height(500 / scaleFactor);
-                }
-                $("#uploadedImage").css("display", "block");
-                applyImgHeight = ($('#uploadedImage').height());
-                applyImgWidth = ($('#uploadedImage').width());
-                document.getElementById("resize-width").value = endWidth;
-                document.getElementById("resize-height").value = endHeight;
+                document.getElementById("resize-width").value = canvas3.width;
+                document.getElementById("resize-height").value = canvas3.height;
                 runImageFilter();
-                document.getElementById("footer-imgwidth").innerHTML = document.getElementById("uploadedImage").width + "&nbsp;x&nbsp;"; 
-                document.getElementById("footer-imgheight").innerHTML = document.getElementById("uploadedImage").height; 
+                drawImage();
+                saveImage = true;
             };
-
         };
         reader.readAsDataURL(input.files[0]);
         resetAll();
@@ -117,9 +118,9 @@ function readURL(input) {
     $('.resize').css('border', 'none');
     $('.master').css('border', 'none');
     $('#uploadedImage').css('border', '1px solid #ccc');
-    if (input.files[0].name.split('.').pop() == "gif") {
-        $('#error-gif').css('display', 'block');
-    }
+   // if (input.files[0].name.split('.').pop() == "gif") {
+        //$('#error-gif').css('display', 'block');
+   // }
     $('#formats').css('display', 'none');
 }
 
@@ -211,84 +212,141 @@ sliderOpacity.oninput = function () {
     previousAction = "opacity";
 }
 
+var zoomamt = 25;
 /*Zoom*/
 var sliderZoom = document.getElementById("zoomslide");
 sliderZoom.oninput = function () {
     zoomamt = this.value;
-    $("#uploadedImage").css('zoom', zoomamt / 25);
+    runZoom();
+}
+
+function runZoom() {
+    $("#drawCanvas").css('transform', ('scale(' + zoomamt / 25 + ')'));
+    $(".bk").css('transform', ('scale(' + zoomamt / 25 + ')'));
+}
+
+function zoom(x) {
+    console.log(1);
+    if (x == 1) {
+        zoomamt++;
+        if (zoomamt > 25) {
+            zoomamt--;
+        }
+        runZoom();
+        console.log(zoomamt);
+    } else if (x == 2) {
+        zoomamt--;
+        if (zoomamt < 5) {
+            zoomamt++;
+        }
+        runZoom();
+    }
+    sliderZoom.value = zoomamt;
 }
 
 function runImageFilter() {
-    $('#uploadedImage').css('filter', 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')');
+
+    if (isUploaded) {
+        eval("ctx2.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')'");
+        drawImage(); 
+    } else {
+        ctx2.drawImage(canvas3, 0, 0, canvas3.width, canvas3.height);
+    }
+
 }
-var canvas2 = document.getElementsByTagName('canvas')[0];
 
 function drawImage(ev) {
-    var ctx = document.getElementById('canvas').getContext('2d'),
-        img = new Image(),
+    var img = new Image(),
         f = document.getElementById("inputIMG").files[0],
         url = window.URL || window.webkitURL,
         src = url.createObjectURL(f);
     img.src = src;
+    isUploaded = true;
     img.onload = function () {
-        getEndCanvasSize();
-        eval("ctx.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')'");
-        if (isRotated) {
+         if (isRotated) {
             ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
             ctx.rotate(rotateAmt * Math.PI / 180);
-            ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5, canvas2.width, canvas2.height);
-            $('#canvas').css('display', 'none');
+          //  ctx.drawImage(img, -img.width * 0.5, -img.height * 0.5, canvas2.width, canvas2.height);
             save();
         } else {
             if (isFlippedHorizontal) {
-                ctx.translate(canvas2.width, 0);
+             //   ctx.translate(canvas2.width, 0);
                 ctx.scale(-1, 1);
             }
             if (isFlippedVertical) {
-                ctx.translate(0, canvas2.height);
+              //  ctx.translate(0, canvas2.height);
                 ctx.scale(1, -1);
             }
-            ctx.drawImage(img, (canvas2.width / 2 - endWidth / 2), (canvas2.height / 2 - endHeight / 2), canvas2.width, canvas2.height);
-            $('#canvas').css('display', 'none');
-            save();
+           // ctx.drawImage(img, (canvas2.width / 2 - endWidth / 2), (canvas2.height / 2 - endHeight / 2), canvas2.width, canvas2.height);
+            if ((scaleFactor < 0.4) || (pgwidth < 500)) {
+                canvas3.width = 300;
+                canvas3.height = 300 / scaleFactor;
+            } else if ((scaleFactor < 0.6) || (pgwidth < 1000)) {
+                canvas3.width = 450;
+                canvas3.height = 450 / scaleFactor;
+            } else {
+                canvas3.width = 500;
+                canvas3.height = 500 / scaleFactor;
+            }
+
+
+            $('.bk').css('width', canvas3.width);
+            $('.bk').css('height', canvas3.height);
+            $('.master').css('width', canvas3.width);
+
+            document.getElementById("footer-imgwidth").innerHTML = canvas3.width + "&nbsp;x&nbsp;";
+            document.getElementById("footer-imgheight").innerHTML = canvas3.height; 
+
+            eval("ctx2.filter = 'sepia(' + (sepiaAmt) + '%) blur(' + (blurAmt / 10) + 'px) grayscale(' + (grayscaleAmt / 10) + ') saturate(' + (saturateAmt) + ') hue-rotate(' + (hueAmt) + 'deg) brightness(' + (brightnessAmt / 10) + ') contrast(' + (contrastAmt / 10) + ') opacity(' + (opacityAmt / 100) + ')'");
+
+            ctx2.drawImage(img, 0, 0, canvas3.width, canvas3.height);
+
+            //  ctx2.drawImage(canvas3, 0, 0, canvas3.width, canvas3.height);
+
+            if (saveImage) {
+             //   save();
+            }
         }
         url.revokeObjectURL(src);
     }
 }
 
-function getEndCanvasSize() {
-    canvas2.width = endWidth;
-    canvas2.height = endHeight;
-}
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-
-function drawCanvas() {
-    ctx.clearRect(0, 0, applyImgWidth, applyImgHeight);
-    drawImage();
-}
 
 function changeSize(x) {
     previousAction = "resize";
     if (x == 1) {
         previousWidth = endWidth;
         endWidth = document.getElementById("resize-width").value;
-        document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
+        canvas3.width = endWidth;
+
+        $('.bk').css('width', canvas3.width);
+        $('.bk').css('height', canvas3.height);
+        $('.bk').css('display', 'inline-block');
+        $('.master').css('background', '#DDDDDD');
+
+        document.getElementById("footer-imgwidth").innerHTML = canvas3.width + "&nbsp;x&nbsp;";
+        document.getElementById("footer-imgheight").innerHTML = canvas3.height; 
+
     } else if (x == 2) {
-        previousWidth = endHeight;
+        previousHeight = endHeight;
         endHeight = document.getElementById("resize-height").value;
-        document.getElementById("footer-origheight").innerHTML = endHeight; 
-    } else if (x == 3) {
-        document.getElementById("resize-width").value = originalWidth;
-        document.getElementById("resize-height").value = originalHeight;
-        document.getElementById("footer-origwidth").innerHTML = originalWidth + "&nbsp;x&nbsp;";
-        document.getElementById("footer-origheight").innerHTML = originalHeight; 
+        canvas3.height = endHeight;
+
+        $('.bk').css('width', canvas3.width);
+        $('.bk').css('height', canvas3.height);
+        $('.bk').css('display', 'inline-block');
+        $('.master').css('background', '#DDDDDD');
+
+        document.getElementById("footer-imgwidth").innerHTML = canvas3.width + "&nbsp;x&nbsp;";
+        document.getElementById("footer-imgheight").innerHTML = canvas3.height; 
+
     }
 }
 
-var zoomamt = 25;
-
+/*
 function zoom(x) {
     if (x == 1) {
         zoomamt++;
@@ -329,9 +387,10 @@ window.addEventListener('wheel', function (e) {
         }
     }
 });
-
+*/
 
 function fileNew() {
+    alert(1);
     $('.zaz').css('display', 'block');
     $('#uploadedImage').css('display', 'none');
     $('.bk').css('background', 'white');
@@ -342,10 +401,9 @@ function fileNew() {
     resetAll();
     document.getElementById("proj-title").value = "New project";
     resizable(document.getElementById('proj-title'), 7);          
-    document.getElementById("footer-origwidth").innerHTML = 0 + "&nbsp;x&nbsp;";
-    document.getElementById("footer-origheight").innerHTML = 0;
-    document.getElementById("footer-imgwidth").innerHTML = 0 + "&nbsp;x&nbsp;";
-    document.getElementById("footer-imgheight").innerHTML = 0; 
+    document.getElementById("footer-imgwidth").innerHTML = canvas3.width + "&nbsp;x&nbsp;";
+    document.getElementById("footer-imgheight").innerHTML = canvas3.height; 
+    resetDrawing();
 }
 
 function resetAll() {
@@ -479,40 +537,63 @@ function runRotate() {
 
 function runFlip(x) {
     if (x == 1) { // horizontal
-        if (isFlippedHorizontal) {
-            isFlippedHorizontal = false;
-            $("#uploadedImage").css('transform', 'scaleX(1)');
-            previousAction = "flipHorizFalse";
-        } else {
-            isFlippedHorizontal = true;
-            $("#uploadedImage").css('transform', 'scaleX(-1)');
-            previousAction = "flipHorizTrue";
+        if (!(isFlippedVertical)) {
+            if (isFlippedHorizontal) {
+                isFlippedHorizontal = false;
+                $('#vertbk').css('cursor', 'pointer');
+                $('#vertbk').css('opacity', '1');
+                $('#horizbk').css('background-color', 'inherit');
+                $('#horizbk').css('border', 'inherit');
+                $("#uploadedImage").css('transform', 'scaleX(1)');
+                previousAction = "flipHorizFalse";
+            } else {
+                isFlippedHorizontal = true;
+                $('#vertbk').css('cursor', 'not-allowed');
+                $('#vertbk').css('opacity', '0.4');
+                $('#horizbk').css('background-color', 'rgb(191, 215, 224)');
+                $('#horizbk').css('border', '1px solid rgb(136, 173, 185)');
+                $("#uploadedImage").css('transform', 'scaleX(-1)');
+                previousAction = "flipHorizTrue";
+            } 
         } 
     } 
     else if (x == 2) { // vertical
-        if (isFlippedVertical) {
-            isFlippedVertical = false;
-            $("#uploadedImage").css('transform', 'scaleY(1)');
-            previousAction = "flipVertFalse";
-        } else {
-            isFlippedVertical = true;   
-            $("#uploadedImage").css('transform', 'scaleY(-1)');
-            previousAction = "flipVertTrue";
+        if (!(isFlippedHorizontal)) {
+            if (isFlippedVertical) {
+                isFlippedVertical = false;
+                $('#horizbk').css('cursor', 'pointer');
+                $('#horizbk').css('opacity', '1');
+                $('#vertbk').css('background-color', 'inherit');
+                $('#vertbk').css('border', 'inherit');
+                $("#uploadedImage").css('transform', 'scaleY(1)');
+                previousAction = "flipVertFalse";
+            } else {
+                isFlippedVertical = true;   
+                $('#horizbk').css('cursor', 'not-allowed');
+                $('#horizbk').css('opacity', '0.4');
+                $('#vertbk').css('background-color', 'rgb(191, 215, 224)');
+                $('#vertbk').css('border', '1px solid rgb(136, 173, 185)');
+                $("#uploadedImage").css('transform', 'scaleY(-1)');
+                previousAction = "flipVertTrue";
+            } 
         } 
     }
 }
 
 function submit() {
-    canvas2.height = 400;
-    canvas2.width = 400;
-    drawCanvas();
+    saveImage = true;
+    save();
+}
+
+function save2() {
+    save();
 }
 
 function save() {
     var link = document.createElement('a');
     link.innerHTML = 'download image';
     link.addEventListener('click', function (ev) {
-        link.href = canvas2.toDataURL();
+        link.href = canvas3.toDataURL();
         link.download = document.getElementById("proj-title").value;
     }, false);
     document.body.appendChild(link);
@@ -520,68 +601,195 @@ function save() {
     $(link).css('display', 'none');
 }
 
+function copy() {
+    saveImage = false;
+    $('#modal-copy').css('display', 'block');
+    $('#canvas').css('border', '1px solid black');
+    canvas4.width = 300;
+    canvas4.height = ((canvas3.height / canvas3.width) * 300);
+    ctx3.drawImage(canvas3, 0, 0, canvas4.width, canvas4.height); 
+}
+
+function closeCopy() {
+    $('#modal-copy').css('display', 'none');
+}
+
 function undo() {
+    if (!(isUndone)) {
+        switch (previousAction) {
+            case "sepia":
+                restoreSepia = sepiaAmt;
+                sepiaAmt = previousSepia;
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "blur":
+                restoreBlur = blurAmt;
+                blurAmt = previousBlur;
+                runImageFilter();
+                isUndone = true;
+                break;
+        
+            case "grayscale":
+                restoreGrayscale = grayscaleAmt;
+                grayscaleAmt = previousGrayscale;
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "saturate":
+                restoreSaturate = saturateAmt;
+                saturateAmt = previousSaturate;
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "brightness":
+                restoreBrightness = brightnessAmt;
+                brightnessAmt = previousBrightness;
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "contrast":
+                restoreContrast = contrastAmt;
+                contrastAmt = previousContrast;
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "hue":
+                restoreHue = hueAmt;
+                hueAmt = previousHue;
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "rotate":
+                restoreRotate = rotateAmt;
+                rotateAmt = previousRotate;
+                $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)');
+                runImageFilter();
+                isUndone = true;
+                break;
+
+            case "resize":
+                restoreWidth = endWidth;
+                restoreHeight = endHeight;
+                endWidth = previousWidth;
+                endHeight = previousHeight;
+                isUndone = true;
+                break;
+
+            case "flipHorizFalse":
+                isFlippedHorizontal = true;
+                $("#uploadedImage").css('transform', 'scaleX(-1)');
+                isUndone = true;
+                break;
+
+            case "flipHorizTrue":
+                isFlippedHorizontal = false;
+                $("#uploadedImage").css('transform', 'scaleX(1)');
+                isUndone = true;
+                break;
+
+            case "flipVertFalse":
+                isFlippedVertical = true;
+                $("#uploadedImage").css('transform', 'scaleY(-1)');
+                isUndone = true;
+                break;
+
+            case "flipVertTrue":
+                isFlippedVertical = false;
+                $("#uploadedImage").css('transform', 'scaleY(1)');
+                isUndone = true;
+                break;
+        }
+    } 
+}
+
+function redo() {
     switch (previousAction) {
         case "sepia":
-            sepiaAmt = previousSepia;
+            sepiaAmt = restoreSepia;
             runImageFilter();
+            isUndone = false;
             break;
 
         case "blur":
-            blurAmt = previousBlur;
+            blurAmt = restoreBlur;
             runImageFilter();
+            isUndone = false;
             break;
-    
+
         case "grayscale":
-            grayscaleAmt = previousGrayscale;
+            grayscaleAmt = restoreGrayscale;
             runImageFilter();
+            isUndone = false;
             break;
 
         case "saturate":
-            saturateAmt = previousSaturate;
+            saturateAmt = restoreSaturate;
             runImageFilter();
+            isUndone = false;
             break;
 
         case "brightness":
-            brightnessAmt = previousBrightness;
+            brightnessAmt = restoreBrightness;
             runImageFilter();
+            isUndone = false;
             break;
 
         case "contrast":
-            contrastAmt = previousContrast;
+            contrastAmt = restoreContrast;
             runImageFilter();
+            isUndone = false;
             break;
 
         case "hue":
-            hueAmt = previousHue;
+            hueAmt = restoreHue;
             runImageFilter();
+            isUndone = false;
             break;
+
         case "rotate":
-            rotateAmt = previousRotate;
+            rotateAmt = restoreRotate;
             $("#uploadedImage").css('transform', 'rotate(' + rotateAmt + 'deg)');
             runImageFilter();
+            isUndone = false;
             break;
+
         case "resize":
-            endWidth = previousWidth;
-            endHeight = previousHeight;
+            endWidth = restoreWidth;
+            endHeight = restoreHeight;
             document.getElementById("footer-origwidth").innerHTML = endWidth + "&nbsp;x&nbsp;";
-            document.getElementById("footer-origheight").innerHTML = endHeight; 
+            document.getElementById("footer-origheight").innerHTML = endHeight;
+            isUndone = false;
             break;
+
         case "flipHorizFalse":
-            isFlippedHorizontal = true;
-            $("#uploadedImage").css('transform', 'scaleX(-1)');
-            break;
-        case "flipHorizTrue":
             isFlippedHorizontal = false;
             $("#uploadedImage").css('transform', 'scaleX(1)');
+            isUndone = false;
             break;
+
+        case "flipHorizTrue":
+            isFlippedHorizontal = true;
+            $("#uploadedImage").css('transform', 'scaleX(-1)');
+            isUndone = false;
+            break;
+
         case "flipVertFalse":
-            isFlippedVertical = true;
-            $("#uploadedImage").css('transform', 'scaleY(-1)');
-            break;
-        case "flipVertTrue":
             isFlippedVertical = false;
             $("#uploadedImage").css('transform', 'scaleY(1)');
+            isUndone = false;
+            break;
+
+        case "flipVertTrue":
+            isFlippedVertical = true;
+            $("#uploadedImage").css('transform', 'scaleY(-1)');
+            isUndone = false;
             break;
     }
 }
@@ -594,3 +802,226 @@ function resizable(el, factor) {
     resizeInput();
 }
 resizable(document.getElementById('proj-title'), 7);
+
+
+/************************************************************************************************************************************************************/
+/************************************************************************************************************************************************************/
+/************************************************************************************************************************************************************/
+/************************************************************************************************************************************************************/
+
+
+var canvas3 = document.getElementById('drawCanvas');
+
+document.getElementById("resize-width").value = canvas3.width;
+document.getElementById("resize-height").value = canvas3.height;
+
+var ctx2 = canvas3.getContext('2d');
+
+var canvas4 = document.getElementById('canvas');
+
+var ctx3 = canvas4.getContext('2d');
+
+
+var lineID = document.getElementById("canvasLineTool"); // Line tool
+var lineStatus = false;
+var eraserStatus = false;
+
+// Default values
+ctx2.lineWidth = '3'; // Line width
+ctx2.lineCap = 'round'; // Line style
+ctx2.lineJoin = 'round'; // Line style
+var color = '#000000'; // Default color
+var mouseDown = false; // Set mouse to be up by default
+
+var isActive = false; // Drawing status
+var plots = []; // Areas to draw
+var colorList = []; // Store previous color to reset to after erasing
+
+canvas3.addEventListener('mousedown', startDraw, false); // Begin drawing
+canvas3.addEventListener('mousemove', draw, false); // Plot points
+canvas3.addEventListener('mouseup', endDraw, false); // Releasing the mouse
+canvas3.addEventListener('mouseout', endDraw, false); // No longer hovering canvas    
+canvas3.addEventListener("click", setSinglePixel); // Single pixels
+canvas3.addEventListener('mouseout', disablePixel, false); // Disable putting pixels if the mouse is not on the canvas
+lineID.addEventListener("click", lineToolStatus); // Enabling or disabling line tool
+canvas3.addEventListener("click", runLineTool); // Running line tool if enabled
+
+function runColorCheck() { return color = document.getElementById("colorPicker").value; } // Get the color 
+
+function drawOnCanvas(color, plots) {
+    ctx2.strokeStyle = color;
+    ctx2.beginPath();
+    for (var i = 1; i < plots.length; i++) { ctx2.lineTo(plots[i].x, plots[i].y); }
+    ctx2.stroke();
+}
+
+function setSinglePixel(e) {
+    if (!isDrawing) return;
+    if (mouseDown) {
+        if (!lineStatus) {
+            runColorCheck();
+            ctx2.strokeStyle = color;
+            var x = e.offsetX || e.layerX - canvas.offsetLeft;
+            var y = e.offsetY || e.layerY - canvas.offsetTop;
+            ctx2.beginPath();
+            ctx2.lineTo(x, y);
+            ctx2.stroke();
+        }
+    }
+}
+
+function drawFromStream(message) {
+    if (!message || message.plots.length < 1) return;
+    drawOnCanvas(message.color, message.plots);
+}
+
+function draw(e) {
+    if (!isActive) return;
+    if (!eraserStatus) {
+        if (!isDrawing) return;
+    }
+    if (!lineStatus) {
+        var x = e.offsetX || e.layerX - canvas3.offsetLeft;
+        var y = e.offsetY || e.layerY - canvas3.offsetTop;
+        plots.push({ x: x, y: y });
+        runColorCheck();
+        drawOnCanvas(color, plots);
+    }
+}
+
+function startDraw(e) { isActive = true; mouseDown = true; }
+function endDraw(e) { isActive = false; plots = []; }
+function disablePixel(e) { mouseDown = false; }
+
+function runEraser() {
+    var oldcolor = color;
+    $('.fa-pen-alt').css('color', 'white');
+    $('.fa-eraser').css('color', '#25911a');
+    colorList.push(oldcolor);
+    if (!eraserStatus) {
+        color = '#fcfcfc';
+        document.getElementById("colorPicker").value = '#fcfcfc';
+        runColorCheck();
+        eraserStatus = true;
+        lineStatus = false; 
+        $('.fa-sliders-h').css('color', '#fff');
+        isDrawing = false;
+        $('.fa-pen-alt').css('color', '#fff');
+    } else {
+        eraserStatus = false;
+        $('.fa-eraser').css('color', 'white');
+        isDrawing = true;
+        $('.fa-pen-alt').css('color', '#25911a');
+        document.getElementById("colorPicker").value = (colorList.slice(-2)[0]);
+    }
+}
+
+function lineToolStatus(e) {
+    if (!lineStatus) { lineStatus = true; $('.fa-sliders-h').css('color', '#25911a'); isDrawing = true; $('.fa-pen-alt').css('color', '#fff'); }
+    else if (lineStatus) { lineStatus = false; $('.fa-sliders-h').css('color', '#fff'); isDrawing = false; $('.fa-pen-alt').css('color', '#25911a'); eraserStatus = false; $('.fa-eraser').css('color', 'white'); }
+}
+
+function runLineTool(e) {
+    if (lineStatus) {
+        runColorCheck();
+        ctx2.strokeStyle = color;
+        var x = e.offsetX || e.layerX - canvas3.offsetLeft;
+        var y = e.offsetY || e.layerY - canvas3.offsetTop;
+        ctx2.lineTo(x, y);
+        ctx2.stroke();
+        isDrawing = false;
+        $('.fa-pen-alt').css('color', 'white');
+        $('.fa-sliders-h').css('color', '#25911a');
+    } else {
+        lineStatus = false;
+        $('.fa-sliders-h').css('color', '#fff');
+
+
+    } 
+}
+
+function runBackground() {
+    runColorCheck();
+    ctx2.beginPath();
+
+    ctx2.rect(0, 0, canvas3.width, canvas3.height);
+    
+    ctx2.fillStyle = color;
+    ctx2.fill();
+}
+
+function resetDrawing() {
+    canvas3.width = canvasLoadWidth;
+    canvas3.height = canvasLoadHeight;
+    $('.bk').css('width', canvas3.width);
+    $('.bk').css('height', canvas3.height);
+    $('.master').css('width', canvas3.width);
+    $('.bk').css('background', '#fff');
+    document.getElementById("footer-imgwidth").innerHTML = canvas3.width + "&nbsp;x&nbsp;";
+    document.getElementById("footer-imgheight").innerHTML = canvas3.height; 
+    eraserStatus = false;
+    lineStatus = false; 
+    document.getElementById("colorPicker").value = '#000000';
+    $('#colorPicker').css('background', '#000000');
+    $('#colorPicker').css('color', '#ffffff');
+    isUploaded = false;
+}
+
+function changeBrushSize() {
+    var brushInput = document.getElementById("brushSizeInput").value;
+    var setBrushDisplay = document.getElementById("brushSizeDisplay");
+    setBrushDisplay.innerHTML = brushInput;
+    ctx2.lineWidth = brushInput;
+}
+
+function runDrawing() {
+    if (isDrawing) {
+        isDrawing = false;
+        $('.fa-pen-alt').css('color', 'white');
+    } else {
+        isDrawing = true;
+        $('.fa-pen-alt').css('color', '#25911a');
+        $('.fa-sliders-h').css('color', '#fff');
+        lineStatus = false; 
+        eraserStatus = false;
+        $('.fa-eraser').css('color', 'white');
+        document.getElementById("colorPicker").value = '#000';
+    }
+}
+
+var picker = new CP(document.querySelector('#colorPicker'));
+picker.on("change", function (color) {
+    this.source.value = '#' + color;
+    eraserStatus = false;
+    $('.tmU1').css('border', '1px solid white');
+    $('#canvasEraser').css('font-weight', 'normal');
+    tempColor = '#' + color;
+    $('#colorPicker').css('background', tempColor);
+    var r = parseInt(color.substr(0, 2), 16);
+    var g = parseInt(color.substr(2, 2), 16);
+    var b = parseInt(color.substr(4, 2), 16);
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    if (yiq >= 128) {
+        $('#colorPicker').css('color', 'black');
+    } else { $('#colorPicker').css('color', 'white'); }
+});    
+
+$("#master-brush").hover(function () {
+    console.log(1);
+    $('#brushSize').css('display', 'inline-block');
+}, function () {
+    $('#brushSize').css('display', 'none');
+});
+
+// Canvas size
+var canvasLoadWidth = $(".master").width();
+var canvasLoadHeight = $(".master").height();
+
+canvas3.width = canvasLoadWidth;
+canvas3.height = canvasLoadHeight;
+
+document.getElementById("resize-width").value = canvas3.width;
+document.getElementById("resize-height").value = canvas3.height;
+
+document.getElementById("footer-imgwidth").innerHTML = canvasLoadWidth + "&nbsp;x&nbsp;";
+document.getElementById("footer-imgheight").innerHTML = canvasLoadHeight; 
